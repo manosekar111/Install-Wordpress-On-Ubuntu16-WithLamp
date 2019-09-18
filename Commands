@@ -1,0 +1,98 @@
+ #installing wordpress using apache2 without phpmyadmin
+ 
+ sudo apt-get update
+ 
+ #To install Apache web server, issue the command below:
+ 
+ sudo apt-get install apache2 apache2-utils 
+ 
+ #We need to enable Apache2 web server to start at system boot time, as well start the service as follows:
+ 
+ sudo systemctl enable apache2
+ sudo systemctl start apache2
+ 
+ #To test whether the server is running, open your web browser and enter http://server_address. The Apache2 default index page will be displayed in case the web server is up and running.
+ 
+ 
+ #Install MySQL Database Server
+ 
+ sudo apt-get install mysql-client mysql-server
+ 
+ #If you want to install MariaDB, you can install it using following command.
+ 
+ sudo apt-get install mariadb-server mariadb-client
+ 
+ #The database server deployment is not yet secure, for this reason, issue the following command to harden it’s security:
+ 
+ sudo mysql_secure_installation 
+ 
+ #Install PHP and Modules
+ 
+ sudo apt-get install php7.0 php7.0-mysql libapache2-mod-php7.0 php7.0-cli php7.0-cgi php7.0-gd
+ 
+ #Furthermore, to test if php is working in collaboration with the web server, we need to create a info.php file inside /var/www/html.
+ 
+ sudo vi /var/www/html/info.php
+ 
+ #And paste the code below into the file, save it and exit.
+ 
+ <?php 
+phpinfo();
+?>
+
+#When that is done, open your web browser and type in the this address http://server_address/info.php. You should be able to view the php info page below as a confirmation.
+
+#Install WordPress CMS
+
+wget -c http://wordpress.org/latest.tar.gz
+tar -xzvf latest.tar.gz
+
+#Then move the WordPress files from the extracted folder to the Apache default root directory, /var/www/html/:
+
+sudo rsync -av wordpress/* /var/www/html/
+
+#Next, set the correct permissions on the website directory, that is give ownership of the WordPress files to the web server as follows:
+
+ sudo chown -R www-data:www-data /var/www/html/
+ sudo chmod -R 755 /var/www/html/
+ 
+ #Create WordPress Database
+ 
+ mysql -u root -p 
+ 
+ #At the mysql shell, type the following commands, pressing Enter after each line of a mysql command. Remember to use your own, valid values for database_name, databaseuser, and also use a strong and secure password as databaseuser_password:
+ 
+ mysql> CREATE DATABASE wp_myblog;
+mysql> GRANT ALL PRIVILEGES ON wp_myblog.* TO 'your_username_here'@'localhost' IDENTIFIED BY 'your_chosen_password_here';
+mysql> FLUSH PRIVILEGES;
+mysql> EXIT;
+
+
+#Go the /var/www/html/ directory and rename existing wp-config-sample.php to wp-config.php:
+
+ sudo mv wp-config-sample.php wp-config.php
+ 
+ #then update it with your database information under the MySQL settings section (refer to the highlighted boxes in the image below):
+ 
+ Vi /var/www/html/wp-config.php
+ 
+ // ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'database_name_here'); /** MySQL database username */ define('DB_USER', 'username_here'); /** MySQL database password */ define('DB_PASSWORD', 'password_here'); /** MySQL hostname */ define('DB_HOST', 'localhost'); /** Database Charset to use in creating database tables. */ define('DB_CHARSET', 'utf8'); /** The Database Collate type. Don't change this if in doubt. */ define('DB_COLLATE', '');
+
+
+#Afterwards, restart the web server and mysql service using the commands below:
+
+http://server-address/wp-admin
+
+
+**********************************************************conclusion********************************************************************
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
